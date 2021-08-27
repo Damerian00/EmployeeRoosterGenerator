@@ -21,17 +21,10 @@ describe('Employee', () => {
     
     });
     it('should return their role based on what was chosen', () => {
-        expect(new Employee("Employee").getRole()).toBe("Employee");
+        expect(new Employee().getRole()).toBe("Employee");
         
     });
   
-//  
-//   describe('Init', () => {
-//     it('should return the number if not a multiple of three or five', () => {
-//       expect(fizzBuzz([1])).toBe('1');
-     
-//     });
-  
- 
+
   
   });
