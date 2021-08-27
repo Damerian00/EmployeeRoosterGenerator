@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Damerian00/hwk08TeamGenerator#readme",
   "dependencies": {
+    "fs": "0.0.1-security",
     "inquirer": "^8.1.2",
     "jest": "^27.1.0"
   }
