@@ -5,7 +5,12 @@ const Intern = require('./lib/Intern');
 const Manager = require('./lib/Manager');
 const fs = require('fs');
 let choicesArray = [];
-
+let employeeName;
+let employeeId;
+let employeeEmail;
+let employeeRole;
+let employeeSpec;
+let cdCont;
 
 init();
 
@@ -17,18 +22,66 @@ function askQuestions (){
     const questions = [
         {
             type: 'input',
-            name: 'employeeName',
-            message: "What is the employee name you wish to add?",
+            name: 'firstName',
+            message: "What is the employee's first name you wish to add?",
+            validate(value) {
+            const fails = value.match(
+              /([0-9 ])/i
+            );
+            if (fails || value === "") {
+                return 'Please only use letters';
+             
+            }
+                return true;
+          },
+          filter(value) {
+            return value.charAt(0).toUpperCase() + value.slice(1);
+          },
+        },
+        {
+            type: 'input',
+            name: 'lastName',
+            message: "What is the employee's last name you wish to add?",
+            validate(value) {
+            const fails = value.match(
+              /([0-9])/i
+            );
+            if (fails || value === "") {
+                return 'Please only use letters';
+             
+            }
+                return true;
+          },
+          filter(value) {
+            return value.charAt(0).toUpperCase() + value.slice(1);
+          },
         },
         {
             type: 'input',
             name: 'employeeId',
             message: "What is their id#?",
+            validate (val) {
+                if (val === "" || val.length < 3){return "Please enter a valid ID"}
+                else {return true;}
+            },
+            filter(val) {
+                return val.toUpperCase();
+              },
         },
         {
             type: 'input',
             name: 'employeeEmail',
             message: "What is their email address?",
+            validate(value) {
+                const pass = value.match(
+                  /(.com)/i
+                );
+                if (pass) {
+                  return true;
+                }
+          
+                return 'Please enter a valid email address';
+              },
         },
         {
             type: 'list',
@@ -40,6 +93,16 @@ function askQuestions (){
            type: 'input',
            name: 'officeNumber',
            message: 'Please enter their work number.',
+           validate(value) {
+            const pass = value.match(
+              /^([01]{1})?[-.\s]?\(?(\d{3})\)?[-.\s]?(\d{3})[-.\s]?(\d{4})\s?((?:#|ext\.?\s?|x\.?\s?){1}(?:\d+)?)?$/i
+            );
+            if (pass) {
+              return true;
+            }
+      
+            return 'Please enter a valid phone number';
+          },
            when: (answers) => answers.role === 'Manager'
         },
         {
@@ -64,27 +127,49 @@ function askQuestions (){
     inquirer.prompt(questions).then((answers) => {
        choicesArray.push(answers);
         moreQuestions(answers);  
+        console.log(choicesArray);
  });
+        
 }
 
 function moreQuestions(answers){
-    console.log("I got fired")
-    if (answers.addMore === true){
-        console.log("time to evaluate")
-        askQuestions();}else{
-            let fileName = "index.html";
-            let newAnswers = choicesArray;
-            writeToFile(fileName, newAnswers);    
+    let name = `${answers.firstName} ${answers.lastName}`
+    let employee;
+    if (answers.role === "Manager"){
+         employee = new Manager(name, answers.employeeId , answers.employeeEmail, answers.officeNumber)
+        employeeSpec = employee.getNumber();
+    } else if (answers.role === "Engineer"){
+        employee = new Engineer(name,answers.employeeId , answers.employeeEmail, answers.gitHub)
+        employeeSpec = employee.getGitHub();
+    } else {
+        employee = new Intern(name,answers.employeeId , answers.employeeEmail, answers.school)
+        employeeSpec = employee.getSchool();
+    }
+    
+    employeeName = employee.getName();
+    console.log(employeeName);
+    employeeId = employee.getId();
+    employeeEmail = employee.getEmail();
+    employeeRole = employee.getRole();
 
-        }
-        console.log(choicesArray);
+    if (answers.addMore === true){
+        askQuestions();
+    
+    }else{
+        createCards(); 
+        writeToFile();
+
+    }
 }
 
 
-function writeToFile (fileName, answers){
-
+function writeToFile (){
+    
+    let path = "./output/"
+    let fileName = "index.html";
+    let filePath = path + fileName;
     const readMeString = 
-`
+ `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -96,23 +181,70 @@ function writeToFile (fileName, answers){
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
-    <h1>Hello ${answers.employeeName}</h1>
+    <header class ="row bg-danger">
+    <h1 class = "text-center p-4 w-100 text-light">My Team</h1>
+    </header>
+        <main id="cardContainer" class = "mt-5 row justify-content-center">
+            ${cdCont}   
+        </main>
 
 
 
 
+ <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
+ <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+ <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+ <script src="../index.js"></script>
+    </body>
+ </html>
+ `;
 
+ fs.writeFile(filePath, readMeString, (err) => {
+     if (err) throw err;
+     console.log('The file has been saved!');
+   });
+  }
 
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-<script src="assets/js/script.js"></script>
-</body>
-</html>
-`;
-fs.writeFile(fileName, readMeString, (err) => {
-    if (err) throw err;
-    console.log('The file has been saved!');
-  });
+/* create the cards */
+function createCards(){
+  for (let i = 0; i < choicesArray.length; i++) {
+      const el = choicesArray[i];
+      let icond;
+      let spec;
+      if (el.role === "Manager"){
+          icond = "👔";
+          spec = `Office Number: ${el.officeNumber}`
+      } else if (el.role === "Engineer"){
+          icond = "🛠";
+          spec = `GitHub: <a href="https://github.com/${el.gitHub}" target = "_blank"> ${el.gitHub}</a>`;
+      } else {
+          icond = "🏫"
+          spec = `School: ${el.school}`;
+      }
+  
+      cdCont += `
+      <div class="card" style="width: 18rem;">
+             <div class="bg-primary p-2">
+              <h5 class="card-title text-light">${el.firstName} ${el.lastName}</h5>
+              <h6 class="card-subtitle mb-2 text-light">${icond} ${el.role}</h6>
+              </div>
+              <div class="card-body">
+                  <ul class="list-group list-group-flush">
+                      <li class="list-group-item">ID: ${el.employeeId}</li>
+                      <li class="list-group-item">${el.employeeEmail}</li>
+                      <li class="list-group-item">${spec}</li>
+                    </ul>
+              </div>
+            </div>
+         
+      `;
+      
+  }  
+    
 }
+ /*  <main id="cardContainer" class = "container">
+        
+          
+
+    </main>*/
