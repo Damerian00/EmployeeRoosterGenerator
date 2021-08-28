@@ -65,8 +65,11 @@
 
 
 
-<!--![Project Preview](./assets/img/site_ss.png) -->
+<a href ="https://youtu.be/jHObLzd6yqQ">Preview Video here</a>
 
+<br />
+
+![Project Preview](./roosterimg.jpg)
 
 
 
