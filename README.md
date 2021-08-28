@@ -65,11 +65,11 @@
 
 
 
-<a href ="https://youtu.be/jHObLzd6yqQ">Preview Video here</a>
+<a href ="https://youtu.be/jHObLzd6yqQ" target = "_blank">Preview Video here</a>
 
 <br />
 
-![Project Preview](./roosterimg.jpg)
+![Project Preview](roosterimg.jpg)
 
 
 
