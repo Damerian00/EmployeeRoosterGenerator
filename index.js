@@ -92,30 +92,42 @@ function askQuestions (){
         {
            type: 'input',
            name: 'officeNumber',
-           message: 'Please enter their work number.',
-           validate(value) {
-            const pass = value.match(
-              /^([01]{1})?[-.\s]?\(?(\d{3})\)?[-.\s]?(\d{3})[-.\s]?(\d{4})\s?((?:#|ext\.?\s?|x\.?\s?){1}(?:\d+)?)?$/i
-            );
-            if (pass) {
-              return true;
-            }
-      
-            return 'Please enter a valid phone number';
+           message: 'Please enter their office number.',
+           validate (val) {
+            if (val === "" || val.length > 3){return "Please enter a valid Office Number that is less then 3 digits"}
+            else {return true;}
+        },
+        filter(val) {
+            return val.toUpperCase();
           },
-           when: (answers) => answers.role === 'Manager'
+         when: (answers) => answers.role === 'Manager'
         },
         {
             type: 'input',
             name: 'gitHub',
             message: 'Please enter their Git Hub username.',
+            validate (val) {
+              if (val === "" || val.length < 3){return "Please enter a valid ID"}
+              else {return true;}
+          },
+          filter(val) {
+              return val.toUpperCase();
+            },
             when: (answers) => answers.role === 'Engineer'
          },
          {
             type: 'input',
             name: 'school',
             message: 'Please enter the school they are attending.',
+            validate (val) {
+              if (val === "" || val.length < 3){return "Please enter a valid ID"}
+              else {return true;}
+          },
+          filter(val) {
+              return val.toUpperCase();
+            },
             when: (answers) => answers.role === 'Intern'
+            
          },
         {
             type: 'confirm',
@@ -127,7 +139,6 @@ function askQuestions (){
     inquirer.prompt(questions).then((answers) => {
        choicesArray.push(answers);
         moreQuestions(answers);  
-        console.log(choicesArray);
  });
         
 }
@@ -167,6 +178,7 @@ function writeToFile (){
     let path = "./output/"
     let fileName = "index.html";
     let filePath = path + fileName;
+    let cssPath = `${path}styles.css`;
     const readMeString = 
  `
 <!DOCTYPE html>
@@ -177,13 +189,13 @@ function writeToFile (){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team Rooster</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header class ="row bg-danger">
     <h1 class = "text-center p-4 w-100 text-light">My Team</h1>
     </header>
-        <main id="cardContainer" class = "mt-5 row justify-content-center">
+        <main id="cardContainer" class = "row justify-content-center">
             ${cdCont}   
         </main>
 
@@ -203,6 +215,35 @@ function writeToFile (){
      if (err) throw err;
      console.log('The file has been saved!');
    });
+   const cssFile = `
+   body{
+    min-width: 280px;
+}
+header{
+    padding: 2vh 0;
+}
+#cardContainer{
+    margin: 10vh auto;
+    justify-content: center;
+    width: 55vw;
+}
+.card {
+    min-width: 256px;
+    width:16rem;
+    margin: 1vh .5vw;
+    box-shadow: 6px 1px rgb(2 24 24 / 50%);
+    border-radius: 12px;
+}
+.card > div {
+    border-radius:12px 12px 0 0px;
+}
+   
+   
+   `;
+   fs.writeFile(cssPath, cssFile, (err) => {
+    if (err) throw err;
+    console.log('The file has been saved!');
+  });
   }
 
 /* create the cards */
@@ -222,7 +263,7 @@ function createCards(){
           spec = `School: ${el.school}`;
       }
       cdCont += `
-      <div class="card" style="width: 18rem;">
+      <div class="card">
              <div class="bg-primary p-2">
               <h5 class="card-title text-light">${el.firstName} ${el.lastName}</h5>
               <h6 class="card-subtitle mb-2 text-light">${icond} ${el.role}</h6>
@@ -241,8 +282,3 @@ function createCards(){
   }  
     
 }
- /*  <main id="cardContainer" class = "container">
-        
-          
-
-    </main>*/
