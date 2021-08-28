@@ -10,7 +10,7 @@ let employeeId;
 let employeeEmail;
 let employeeRole;
 let employeeSpec;
-let cdCont;
+let cdCont = "";
 
 init();
 
@@ -147,7 +147,6 @@ function moreQuestions(answers){
     }
     
     employeeName = employee.getName();
-    console.log(employeeName);
     employeeId = employee.getId();
     employeeEmail = employee.getEmail();
     employeeRole = employee.getRole();
@@ -222,7 +221,6 @@ function createCards(){
           icond = "🏫"
           spec = `School: ${el.school}`;
       }
-  
       cdCont += `
       <div class="card" style="width: 18rem;">
              <div class="bg-primary p-2">
@@ -232,7 +230,7 @@ function createCards(){
               <div class="card-body">
                   <ul class="list-group list-group-flush">
                       <li class="list-group-item">ID: ${el.employeeId}</li>
-                      <li class="list-group-item">${el.employeeEmail}</li>
+                      <li class="list-group-item"><a href="mailto:${el.employeeEmail}">${el.employeeEmail}</a></li>
                       <li class="list-group-item">${spec}</li>
                     </ul>
               </div>
