@@ -69,7 +69,7 @@
 
 <br />
 
-![Project Preview](roosterimg.JPG)
+![Project Preview](roosterimg.jpg)
 
 
 
